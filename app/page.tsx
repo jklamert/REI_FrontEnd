@@ -64,14 +64,13 @@ import {
   HiX,
 } from "react-icons/hi";
 import Header from "./_components/header";
-import Sidebar from "./_components/sidebar";
 import ActualSidebar from "./_components/actualSidebar";
 import { SidebarProvider } from "./context/SidebarContext";
 
 export default function Index(): JSX.Element {
   return (
     <SidebarProvider>
-      <Header />
+      <Header activeNav={0} />
       <div className="flex dark:bg-gray-900">
         <main className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]">
           <HomePage />

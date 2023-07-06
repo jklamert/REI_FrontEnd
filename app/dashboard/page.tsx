@@ -8,10 +8,10 @@ import { SidebarProvider } from "../context/SidebarContext";
 export default function Index(): JSX.Element {
     return (
       <SidebarProvider>
-        <Header activeNav={-1} />
+        <Header activeNav={4} />
         <div className="flex dark:bg-gray-900">
           <main className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]">
-            <MySearchesPage />
+            <DashboardPage />
           </main>
           <div className="order-1">
             <ActualSidebar />
@@ -21,10 +21,16 @@ export default function Index(): JSX.Element {
     );
   }
 
-function MySearchesPage(): JSX.Element {
+function DashboardPage(): JSX.Element {
   return (
     <div className="p-6">
-        My Searches
+      <section>
+        <header>
+          <h1 className="mb-6 text-5xl font-extrabold dark:text-white">
+           Dashboard Coming Soon...
+          </h1>
+        </header>
+      </section>
     </div>
   );
 }

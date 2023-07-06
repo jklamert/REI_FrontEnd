@@ -3,16 +3,15 @@
 import React from "react";
 import Header from "../_components/header";
 import ActualSidebar from "../_components/actualSidebar";
-import Sidebar from "./components/sidebar";
 import { SidebarProvider } from "../context/SidebarContext";
 
 export default function Index(): JSX.Element {
     return (
       <SidebarProvider>
-        <Header />
+        <Header activeNav={-1} />
         <div className="flex dark:bg-gray-900">
           <main className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]">
-            <HomePage />
+            <PrivacyPage />
           </main>
           <div className="order-1">
             <ActualSidebar />
@@ -22,7 +21,7 @@ export default function Index(): JSX.Element {
     );
   }
 
-function HomePage(): JSX.Element {
+function PrivacyPage(): JSX.Element {
   return (
     <div className="p-6">
         About

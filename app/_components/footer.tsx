@@ -14,12 +14,12 @@ const FooterExample: FC<Record<string, never>> = function () {
           <Footer container>
             <div className="w-full">
               <div className="grid w-full justify-between sm:flex sm:justify-between md:flex md:grid-cols-1">
-                <div>
-                    <FaDog height="24" width="24"/>
+               
+                    
                     <span className="self-center whitespace-nowrap px-3 text-xl font-semibold dark:text-white">
-                        RE BirdDog
+                    <FaDog height="24" width="24" className="dark:text-white"/> RE BirdDog
                     </span>
-                </div>
+               
                 <div className="grid grid-cols-2 gap-8 sm:mt-4 sm:grid-cols-3 sm:gap-6">
                   <div>
                     <Footer.Title title="Follow us" />

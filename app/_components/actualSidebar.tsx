@@ -19,7 +19,7 @@ const ActualSidebar: FC<Record<string, never>> = function () {
         <Sidebar>
           <Sidebar.Items>
             <Sidebar.ItemGroup>
-              <Sidebar.Item href="/" icon={HiChartPie}>
+              <Sidebar.Item href="/dashboard" icon={HiChartPie}>
                 Dashboard
               </Sidebar.Item>
               <Sidebar.Item href="/mysearches" icon={HiSearch}>
@@ -33,17 +33,19 @@ const ActualSidebar: FC<Record<string, never>> = function () {
               </Sidebar.Item>
             </Sidebar.ItemGroup>
             <Sidebar.ItemGroup>
-              <Sidebar.Item href="#" icon={HiDocument}>
-                Documentation
-              </Sidebar.Item>
-              <Sidebar.Item href="#" icon={BiHelpCircle}>
-                Help
-              </Sidebar.Item>
               <Sidebar.Item href="#" icon={HiLogin}>
                 Login
               </Sidebar.Item>
               <Sidebar.Item href="#" icon={HiLogout}>
                 Logout
+              </Sidebar.Item>
+            </Sidebar.ItemGroup>
+            <Sidebar.ItemGroup>
+              <Sidebar.Item href="/documentation" icon={HiDocument}>
+                Documentation
+              </Sidebar.Item>
+              <Sidebar.Item href="/help" icon={BiHelpCircle}>
+                Help
               </Sidebar.Item>
             </Sidebar.ItemGroup>
           </Sidebar.Items>

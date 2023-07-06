@@ -1,11 +1,10 @@
 "use client";
 import { DarkThemeToggle, Navbar } from "flowbite-react";
-import Image from "next/image";
 import { FaDog } from "react-icons/fa";
 import { FC } from "react";
 import { useSidebarContext } from "../context/SidebarContext";
 
-const Header: FC<Record<string, never>> = function () {
+const Header: FC<Record<string, number>> = function ({activeNav}) {
   const { isOpenOnSmallScreens, isPageWithSidebar, setOpenOnSmallScreens } =
     useSidebarContext();
 
@@ -49,9 +48,9 @@ const Header: FC<Record<string, never>> = function () {
           </button>
         )}
         <Navbar.Brand href="/">
-          <FaDog height="24" width="24"/>
+          <FaDog height="24" width="24" className="dark:text-white"/>
           <span className="self-center whitespace-nowrap px-3 text-xl font-semibold dark:text-white">
-            RE Bird Dog
+            RE BirdDog
           </span>
         </Navbar.Brand>
         <div className="flex md:order-2">
@@ -59,13 +58,13 @@ const Header: FC<Record<string, never>> = function () {
           <DarkThemeToggle />
         </div>
         <Navbar.Collapse>
-          <Navbar.Link href="/" active>
+          <Navbar.Link href="/" active={activeNav === 0}>
             Home
           </Navbar.Link>
-          <Navbar.Link href="/feed">Feed</Navbar.Link>
-          <Navbar.Link href="/">Services</Navbar.Link>
-          <Navbar.Link href="/">Pricing</Navbar.Link>
-          <Navbar.Link href="/">Contact</Navbar.Link>
+          <Navbar.Link href="/feed" active={activeNav === 1}>Feed</Navbar.Link>
+          <Navbar.Link href="/services" active={activeNav === 2}>Services</Navbar.Link>
+          <Navbar.Link href="/pricing" active={activeNav === 3}>Pricing</Navbar.Link>
+          <Navbar.Link href="/contact" active={activeNav === 4}>Contact</Navbar.Link>
         </Navbar.Collapse>
       </Navbar>
     </header>

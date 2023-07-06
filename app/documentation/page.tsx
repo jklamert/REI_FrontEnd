@@ -11,7 +11,7 @@ export default function Index(): JSX.Element {
         <Header activeNav={-1} />
         <div className="flex dark:bg-gray-900">
           <main className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]">
-            <MySearchesPage />
+            <DocsPage />
           </main>
           <div className="order-1">
             <ActualSidebar />
@@ -21,10 +21,10 @@ export default function Index(): JSX.Element {
     );
   }
 
-function MySearchesPage(): JSX.Element {
+function DocsPage(): JSX.Element {
   return (
-    <div className="p-6">
-        My Searches
+    <div className="p-6 dark:text-white">
+        Docs go here.
     </div>
   );
 }
