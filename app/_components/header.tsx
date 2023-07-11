@@ -10,7 +10,7 @@ const Header: FC<Record<string, number>> = function ({activeNav}) {
 
   return (
     <header className="sticky top-0 z-20">
-      <Navbar fluid>
+      <Navbar fluid className="sticky top-0 z-40 w-full backdrop-blur flex-none lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-slate-50">
         {isPageWithSidebar && (
           <button
             aria-controls="sidebar"
@@ -50,7 +50,7 @@ const Header: FC<Record<string, number>> = function ({activeNav}) {
         <Navbar.Brand href="/">
           <FaDog height="24" width="24" className="dark:text-white"/>
           <span className="self-center whitespace-nowrap px-3 text-xl font-semibold dark:text-white">
-            RE BirdDog
+            RE Scout
           </span>
         </Navbar.Brand>
         <div className="flex md:order-2">

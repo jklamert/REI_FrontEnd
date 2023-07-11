@@ -30,7 +30,7 @@ function PricingPage(): JSX.Element {
          Pricing
         </h1>
       </header>
-      RE BirdDog is currently free to use! It serves as one of my portfolio projects and I use it to invest in my local area. 
+      RE Scout is currently free to use! It serves as one of my portfolio projects and I use it to invest in my local area. 
         If you would like to learn more about me, or how to contact me, please visit the bottom of any page or click on 'Contact' in the top navigation for more information.  
     </section>
   </div>

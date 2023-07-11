@@ -24,7 +24,7 @@ export default function Index(): JSX.Element {
 function HelpPage(): JSX.Element {
   return (
     <div className="p-6 dark:text-white">
-        RE BirdDog is a tool that provides level one filtering of the MLS deal funnel. 
+        RE Scout is a tool that provides level one filtering of the MLS deal funnel. 
         You can setup searches with custom parameters that will determine what fits into your buy box. 
         When a property fits your search criteria, it be will presented to you in your feed. 
         Swipe left to reject a deal. Swipe right to accept a deal.
