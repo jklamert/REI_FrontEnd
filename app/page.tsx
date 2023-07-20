@@ -66,10 +66,19 @@ import {
 import Header from "./_components/header";
 import ActualSidebar from "./_components/actualSidebar";
 import { SidebarProvider } from "./context/SidebarContext";
-import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloProvider, ApolloClient, InMemoryCache, HttpLink } from "@apollo/client";
 import { gql } from "@apollo/client";
+import fetch from 'cross-fetch';
+
 export default function Index(): JSX.Element {
-  const client = new ApolloClient({uri: 'http://localhost:4000', cache: new InMemoryCache()});
+  const API_URL = 'http://localhost:4000';
+  const client = new ApolloClient({
+    link: new HttpLink({
+      uri: API_URL,
+      fetch: fetch,
+    }),
+    cache: new InMemoryCache(),
+  })
   
   return (
     <ApolloProvider client={client}>
@@ -94,7 +103,7 @@ function HomePage(): JSX.Element {
       <section>
         <header>
           <h1 className="mb-6 text-5xl font-extrabold dark:text-white">
-            Welcome to <code>Flowbite</code> on <code>Next.js</code>!
+            Welcome to Flowbite on Next.js!
           </h1>
         </header>
       </section>

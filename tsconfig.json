@@ -29,7 +29,12 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "baseUrl": ".",
+    "paths": {
+      "#components/*": ["app/_components/*"],
+      "#app/*": ["app/*"]
+    }
   },
   "exclude": [".next", "node_modules"],
   "include": [".next/types/**/*.ts", "next-env.d.ts", "**/*.ts", "**/*.tsx"]
