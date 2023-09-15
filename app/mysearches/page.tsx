@@ -92,6 +92,7 @@ function MySearchesPage(): JSX.Element {
     // if the cache data from SSR is only partial, this will still trigger a network request
     fetchPolicy: "cache-first",
   });
+
   // const router = useRouter();
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error.message}</div>;
