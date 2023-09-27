@@ -1,4 +1,9 @@
-import { isNegative, isPositive, isWholeNum } from "#app/_utils/validators";
+import {
+  isNegative,
+  isPositive,
+  isValidZip,
+  isWholeNum,
+} from "#app/_utils/validators";
 
 describe("isWholeNum", () => {
   it("isWholeNum valid for 6", () => {
@@ -80,6 +85,29 @@ describe("isNegative", () => {
   it("isNegative valid for -1.1", () => {
     const input = -1.1;
     const result = isNegative(input);
+    expect(result).toBeTruthy();
+  });
+});
+
+describe("isValidZip", () => {
+  it("isValidZip invalid for empty string", () => {
+    const input = "";
+    const result = isValidZip(input);
+    expect(result).toBeFalsy();
+  });
+  it("isValidZip invalid for 30", () => {
+    const input = "30";
+    const result = isValidZip(input);
+    expect(result).toBeFalsy();
+  });
+  it("isValidZip invalid for 630107", () => {
+    const input = "0";
+    const result = isValidZip(input);
+    expect(result).toBeFalsy();
+  });
+  it("isValidZip valid for 63010", () => {
+    const input = "63010";
+    const result = isValidZip(input);
     expect(result).toBeTruthy();
   });
 });

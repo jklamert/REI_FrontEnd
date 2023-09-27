@@ -1,129 +1,36 @@
 "use client";
 
+import {
+  EXPENSE,
+  EXPENSE_MUTATION,
+  SEARCH,
+  SEARCH_MUTATION,
+  SEARCH_QUERY,
+} from "#app/_types/allTypes";
 import { isPositive, isWholeNum } from "#app/_utils/validators";
 import ActualSidebar from "#components/actualSidebar";
 import Header from "#components/header";
-import { gql, TypedDocumentNode, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
 import { Button, Card, Label, Spinner, TextInput } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 // import {getClient} from "#app/context/ApolloClient";
 
-type EXPENSE = {
-  id: number;
-  taxes: number;
-  insurance: number;
-  water: number;
-  sewer: number;
-  garbage: number;
-  electric: number;
-  gas: number;
-  hoa: number;
-  lot: number;
-  vacancy: number;
-  repairs: number;
-  capex: number;
-  management: number;
-  mortgage: number;
-};
-
-type SEARCH = {
-  id: string;
-  city: string;
-  state: string;
-  expenseFk: EXPENSE;
-  zip: string;
-  user: number;
-  beds: number;
-  minBath: number;
-  maxBath: number;
-  type: string;
-  props: string;
-  key: string;
-};
-
-type EXPENSE_MUTATION_RESPONSE = {
-  code: number;
-  success: boolean;
-  message: string;
-  expense: EXPENSE;
-};
-
-const SEARCH_QUERY: TypedDocumentNode<{
-  search: SEARCH;
-}> = gql`
-  query Query($id: Int) {
-    search(id: $id) {
-      id
-      city
-      state
-      expenseFk {
-        id
-        taxes
-        insurance
-        water
-        sewer
-        garbage
-        electric
-        gas
-        hoa
-        lot
-        vacancy
-        repairs
-        capex
-        management
-        mortgage
-      }
-      zip
-      user
-      beds
-      minBath
-      maxBath
-    }
-  }
-`;
-
-const EXPENSE_MUTATION: TypedDocumentNode<{
-  expense: EXPENSE_MUTATION_RESPONSE;
-}> = gql`
-  mutation Mutation($expense: ExpenseInput!) {
-    addExpense(expense: $expense) {
-      code
-      success
-      message
-      expense {
-        id
-        taxes
-        insurance
-        water
-        sewer
-        garbage
-        electric
-        gas
-        hoa
-        lot
-        vacancy
-        repairs
-        capex
-        management
-        mortgage
-      }
-    }
-  }
-`;
-
 type searchDetailProps = {
-  id: number;
+  params: { id: string };
+  searchParams: object;
 };
 
 export default function Index(props: searchDetailProps): JSX.Element {
-  const { id } = props;
   return (
     <div>
       <Header activeNav={-1} />
       <div className="flex dark:bg-gray-900">
-        <main className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]">
-          <SearchDetailPage id={id} />
+        <main
+          style={{ height: "100%" }}
+          className="order-2 mx-4 mt-4 mb-24 flex-[1_0_16rem]"
+        >
+          <SearchDetailPage id={props.params.id} />
         </main>
         <div className="order-1">
           <ActualSidebar />
@@ -133,28 +40,49 @@ export default function Index(props: searchDetailProps): JSX.Element {
   );
 }
 
-function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
+function SearchDetailPage(props: { id: string }): JSX.Element {
   const [editModeCriteria, setEditModeCriteria] = useState(false);
   const [editModeExpense, setEditModeExpense] = useState(false);
+
   const [
     updateExpense,
-    { expenseData, expenseMutationLoading, expenseMutationError },
-  ] = useMutation(EXPENSE_MUTATION);
-
-  // const [expense, setExpense] = useState({});
-  // const [criteria, setCriteria] = useState({});
-
-  // const onExpenseChanged = (fieldName, fieldValue) => {
-
-  // };
-
-  // const onCriteraChanged = (fieldName, fieldValue) => {};
+    { loading: updateExpenseLoading, error: updateExpenseError },
+  ] = useMutation(
+    EXPENSE_MUTATION,
+    {
+      refetchQueries: [SEARCH_QUERY],
+    }
+    // { update: updateCache }
+  );
+  const [
+    updateSearchCriteria,
+    { loading: updateCriteriaLoading, error: updateCriteriaError },
+  ] = useMutation(
+    SEARCH_MUTATION,
+    {
+      refetchQueries: [SEARCH_QUERY],
+    }
+    // { update: updateCache }
+  );
 
   const { data, error, loading } = useQuery(SEARCH_QUERY, {
-    variables: { id: 1 },
+    variables: { id: parseInt(props.id) },
     // if the cache data from SSR is only partial, this will still trigger a network request
     fetchPolicy: "cache-first",
   });
+
+  // const updateCache = (cache, { data }) => {
+  //   // Fetch the todos from the cache
+  //   const existingTodos = cache.readQuery({
+  //     query: SEARCH_QUERY,
+  //   });
+  //   // Add the new todo to the cache
+  //   const newTodo = data.expense[0];
+  //   cache.writeQuery({
+  //     query: GET_MY_TODOS,
+  //     data: { todos: [newTodo, ...existingTodos.todos] },
+  //   });
+  // };
 
   //Search Criteria State
   const [city, setCity] = useState("");
@@ -217,21 +145,21 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
    * Method to return the expense data back to the source.
    * @param searchData
    */
-  function setExpenseData(searchData: SEARCH) {
-    setTaxes(searchData?.expenseFk?.taxes + "");
-    setInsurance(searchData?.expenseFk?.insurance + "");
-    setWater(searchData?.expenseFk?.water + "");
-    setSewer(searchData?.expenseFk?.sewer + "");
-    setGarbage(searchData?.expenseFk?.garbage + "");
-    setElectric(searchData?.expenseFk?.electric + "");
-    setGas(searchData?.expenseFk?.gas + "");
-    setHoa(searchData?.expenseFk?.hoa + "");
-    setLot(searchData?.expenseFk?.lot + "");
-    setVacancy(searchData?.expenseFk?.vacancy + "");
-    setRepairs(searchData?.expenseFk?.repairs + "");
-    setCapex(searchData?.expenseFk?.capex + "");
-    setManagement(searchData?.expenseFk?.management + "");
-    setMortgage(searchData?.expenseFk?.mortgage + "");
+  function setExpenseData(data: EXPENSE) {
+    setTaxes(data?.taxes ? data?.taxes + "" : "");
+    setInsurance(data?.insurance ? data?.insurance + "" : "");
+    setWater(data?.water ? data?.water + "" : "");
+    setSewer(data?.sewer ? data?.sewer + "" : "");
+    setGarbage(data?.garbage ? data?.garbage + "" : "");
+    setElectric(data?.electric ? data?.electric + "" : "");
+    setGas(data?.gas ? data?.gas + "" : "");
+    setHoa(data?.hoa ? data?.hoa + "" : "");
+    setLot(data?.lot ? data?.lot + "" : "");
+    setVacancy(data?.vacancy ? data?.vacancy + "" : "");
+    setRepairs(data?.repairs ? data?.repairs + "" : "");
+    setCapex(data?.capex ? data?.capex + "" : "");
+    setManagement(data?.management ? data?.management + "" : "");
+    setMortgage(data?.mortgage ? data?.mortgage + "" : "");
   }
 
   /**
@@ -239,9 +167,10 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
    * @param searchData
    */
   function setCriteriaData(searchData: SEARCH) {
-    setCity(searchData?.city);
-    setState(searchData?.state);
-    setZip(searchData?.zip);
+    setCity(searchData?.city + "");
+    setZip(searchData?.zip + "");
+    setState(searchData?.state + "");
+
     setBeds(searchData?.beds + "");
     setMaxBath(searchData?.maxBath + "");
     setMinBath(searchData?.minBath + "");
@@ -251,7 +180,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
     if (data) {
       const searchData = data?.search;
       if (searchData) {
-        setExpenseData(searchData);
+        setExpenseData(searchData?.expenseFk);
         setCriteriaData(searchData);
       }
     }
@@ -432,9 +361,124 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
     setMortgage(value + "");
   };
 
+  const onSearchCriteriaSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.debug("Submitting search criteria.");
+    await updateSearchCriteria({
+      variables: {
+        search: {
+          id: data?.search.id,
+          city: city,
+          state: state,
+          expenseFk: {
+            id: data?.search?.expenseFk?.id,
+            taxes: parseInt(taxes, 10),
+            insurance: parseInt(insurance, 10),
+            water: parseInt(water, 10),
+            sewer: parseInt(sewer, 10),
+            garbage: parseInt(garbage, 10),
+            electric: parseInt(electric, 10),
+            gas: parseInt(gas, 10),
+            hoa: parseInt(hoa, 10),
+            lot: parseInt(lot, 10),
+            vacancy: parseInt(vacancy, 10),
+            repairs: parseInt(repairs, 10),
+            capex: parseInt(capex, 10),
+            management: parseInt(management, 10),
+            mortgage: parseInt(mortgage, 10),
+          },
+          zip: zip,
+          user: data?.search?.user,
+          beds: parseInt(beds, 10),
+          minBath: parseInt(minBath, 10),
+          maxBath: parseInt(maxBath, 10),
+        },
+      },
+    });
+
+    if (updateCriteriaError) {
+      window.alert(updateCriteriaError.message);
+    }
+
+    setEditModeCriteria(false);
+  };
+
+  const onExpenseSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.debug("Submitting expense data.");
+
+    const id = data?.search?.expenseFk?.id;
+    if (id) {
+      await updateExpense({
+        variables: {
+          expense: {
+            id: id,
+            taxes: parseInt(taxes, 10),
+            insurance: parseInt(insurance, 10),
+            water: parseInt(water, 10),
+            sewer: parseInt(sewer, 10),
+            garbage: parseInt(garbage, 10),
+            electric: parseInt(electric, 10),
+            gas: parseInt(gas, 10),
+            hoa: parseInt(hoa, 10),
+            lot: parseInt(lot, 10),
+            vacancy: parseInt(vacancy, 10),
+            repairs: parseInt(repairs, 10),
+            capex: parseInt(capex, 10),
+            management: parseInt(management, 10),
+            mortgage: parseInt(mortgage, 10),
+          },
+        },
+      });
+      if (updateExpenseError) {
+        window.alert(updateCriteriaError?.message);
+      }
+    } else {
+      //We are adding new expense info to a search criteria obj.
+      await updateSearchCriteria({
+        variables: {
+          search: {
+            id: data?.search.id,
+            city: city,
+            state: state,
+            expenseFk: {
+              taxes: parseInt(taxes, 10),
+              insurance: parseInt(insurance, 10),
+              water: parseInt(water, 10),
+              sewer: parseInt(sewer, 10),
+              garbage: parseInt(garbage, 10),
+              electric: parseInt(electric, 10),
+              gas: parseInt(gas, 10),
+              hoa: parseInt(hoa, 10),
+              lot: parseInt(lot, 10),
+              vacancy: parseInt(vacancy, 10),
+              repairs: parseInt(repairs, 10),
+              capex: parseInt(capex, 10),
+              management: parseInt(management, 10),
+              mortgage: parseInt(mortgage, 10),
+            },
+            zip: zip,
+            user: data?.search?.user,
+            beds: parseInt(beds, 10),
+            minBath: parseInt(minBath, 10),
+            maxBath: parseInt(maxBath, 10),
+          },
+        },
+      });
+      if (updateCriteriaError) {
+        window.alert(updateCriteriaError.message);
+      }
+    }
+
+    setEditModeExpense(false);
+  };
+
   if (loading)
     return (
-      <div className="grid grid-flow-col auto-cols-max justify-around content-center">
+      <div
+        className="grid grid-flow-col auto-cols-max justify-around content-center h-full"
+        style={{ height: "100%" }}
+      >
         <Spinner aria-label="Loading Search Detail" />
       </div>
     );
@@ -445,17 +489,34 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
     return (
       <div className="gap-4 grid grid-cols-1 justify-around content-center">
         {editModeCriteria ? (
-          <Card className="max-w-sm">
+          <Card className="max-w">
+            {/* <Toast>
+              <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200">
+                <HiCheck className="h-5 w-5" />
+              </div>
+              <div className="ml-3 text-sm font-normal">Save Successful!</div>
+              <Toast.Toggle />
+            </Toast> */}
+
             <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white grid grid-flow-col auto-cols-max justify-around content-center">
               <span className="shrink-0 self-center">
                 {city} {state}, {zip}
               </span>
             </h5>
-            <p className="grid grid-flow-col auto-cols-max justify-around content-center">
+            <p className="grid grid-flow-col auto-cols-max justify-around content-center dark:text-white">
               Search Criteria
             </p>
 
-            <form className="flex flex-col gap-4">
+            {/* {updateCriteriaLoading ? (
+              <div className="grid grid-flow-col auto-cols-max justify-around content-center">
+                <Spinner aria-label="Loading Search Criteria" />
+              </div>
+            ) : null} */}
+
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={onSearchCriteriaSubmit}
+            >
               <div>
                 <div className="mb-2 block">
                   <Label htmlFor="Beds" value="Beds" />
@@ -507,7 +568,9 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
               </div>
               <div className="flex flex-row gap-2">
                 <Button
-                  className="bg-red-700"
+                  type="button"
+                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800"
+                  disabled={updateCriteriaLoading}
                   onClick={() => {
                     setCriteriaData(data?.search);
                     setEditModeCriteria(false);
@@ -515,26 +578,20 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  onClick={() => {
-                    //Submit form
-                    setEditModeCriteria(false);
-                  }}
-                >
+                <Button disabled={updateCriteriaLoading} type="submit">
                   Submit
                 </Button>
               </div>
             </form>
           </Card>
         ) : (
-          <Card className="max-w-sm" href="#">
+          <Card className="max-w" href="#">
             <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white grid grid-flow-col auto-cols-max justify-around content-center">
               <span className="shrink-0 self-center">
                 {city} {state}, {zip}
               </span>
             </h5>
-            <p className="grid grid-flow-col auto-cols-max justify-around content-center">
+            <p className="grid grid-flow-col auto-cols-max justify-around content-center dark:text-white">
               Search Criteria
             </p>
 
@@ -573,18 +630,18 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
           </Card>
         )}
         {editModeExpense ? (
-          <Card className="max-w-sm">
-            {expenseMutationLoading ? (
+          <Card className="max-w">
+            {/* {updateExpenseLoading ? (
               <div className="grid grid-flow-col auto-cols-max justify-around content-center">
-                <Spinner aria-label="Loading Search Detail" />
+                <Spinner aria-label="Loading Expense Data" />
               </div>
-            ) : null}
+            ) : null} */}
 
-            <form className="flex flex-col gap-4">
+            <form className="flex flex-col gap-4" onSubmit={onExpenseSubmit}>
               <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white grid grid-flow-col auto-cols-max justify-around content-center">
                 <span className="shrink-0 self-center">Expenses</span>
               </h5>
-              <p className="grid grid-flow-col auto-cols-max justify-around content-center">
+              <p className="grid grid-flow-col auto-cols-max justify-around content-center dark:text-white">
                 All expenses are on a monthly basis.
               </p>
               <div>
@@ -814,58 +871,30 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
 
               <div className="flex flex-row gap-2">
                 <Button
-                  className="bg-red-700"
+                  type="button"
+                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800"
+                  disabled={updateExpenseLoading}
                   onClick={() => {
                     setEditModeExpense(false);
-                    setExpenseData(data?.search);
+                    setExpenseData(data?.search?.expenseFk);
                   }}
                 >
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  onClick={async () => {
-                    //Submit form
-                    const results = await updateExpense({
-                      variables: {
-                        expense: {
-                          id: data?.search?.expenseFk?.id,
-                          taxes: taxes,
-                          insurance: insurance,
-                          water: water,
-                          sewer: sewer,
-                          garbage: garbage,
-                          electric: electric,
-                          gas: gas,
-                          hoa: hoa,
-                          lot: lot,
-                          vacancy: vacancy,
-                          repairs: repairs,
-                          capex: capex,
-                          management: management,
-                          mortgage: mortgage,
-                        },
-                      },
-                    });
-                    const mutationData = results.data;
-                    console.debug("Mutation Data: ", mutationData);
-
-                    setEditModeExpense(false);
-                  }}
-                >
+                <Button disabled={updateExpenseLoading} type="submit">
                   Submit
                 </Button>
               </div>
             </form>
           </Card>
         ) : (
-          <Card className="max-w-sm" href="#">
+          <Card className="max-w" href="#">
             <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white grid grid-flow-col auto-cols-max justify-around content-center">
               <span className="shrink-0 self-center">
                 {city} {state}, {zip}
               </span>
             </h5>
-            <p className="grid grid-flow-col auto-cols-max justify-around content-center">
+            <p className="grid grid-flow-col auto-cols-max justify-around content-center dark:text-white">
               Typical Expenses
             </p>
 
@@ -874,7 +903,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Taxes: ${taxes}
+                      Taxes: ${taxes || 0}
                     </p>
                   </div>
                 </div>
@@ -883,7 +912,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Insurance: ${insurance}
+                      Insurance: ${insurance || 0}
                     </p>
                   </div>
                 </div>
@@ -892,7 +921,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Water: ${water}
+                      Water: ${water || 0}
                     </p>
                   </div>
                 </div>
@@ -901,7 +930,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Sewer: ${sewer}
+                      Sewer: ${sewer || 0}
                     </p>
                   </div>
                 </div>
@@ -910,7 +939,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Garbage: ${garbage}
+                      Garbage: ${garbage || 0}
                     </p>
                   </div>
                 </div>
@@ -919,7 +948,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Electric: ${electric}
+                      Electric: ${electric || 0}
                     </p>
                   </div>
                 </div>
@@ -928,7 +957,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Gas: ${gas}
+                      Gas: ${gas || 0}
                     </p>
                   </div>
                 </div>
@@ -937,7 +966,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Hoa: ${hoa}
+                      Hoa: ${hoa || 0}
                     </p>
                   </div>
                 </div>
@@ -946,7 +975,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Lot: ${lot}
+                      Lot: ${lot || 0}
                     </p>
                   </div>
                 </div>
@@ -955,7 +984,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Vacancy: ${vacancy}
+                      Vacancy: ${vacancy || 0}
                     </p>
                   </div>
                 </div>
@@ -964,7 +993,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Repairs: ${repairs}
+                      Repairs: ${repairs || 0}
                     </p>
                   </div>
                 </div>
@@ -973,7 +1002,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Capex: ${capex}
+                      Capex: ${capex || 0}
                     </p>
                   </div>
                 </div>
@@ -982,7 +1011,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Management: ${management}
+                      Management: ${management || 0}
                     </p>
                   </div>
                 </div>
@@ -991,7 +1020,7 @@ function SearchDetailPage({ id }: searchDetailProps): JSX.Element {
                 <div className="flex items-center space-x-4">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                      Mortgage: ${mortgage}
+                      Mortgage: ${mortgage || 0}
                     </p>
                   </div>
                 </div>

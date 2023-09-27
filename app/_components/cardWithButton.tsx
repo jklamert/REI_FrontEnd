@@ -12,7 +12,7 @@ type CardWithActionButtonProps = {
 
 export default function CardWithActionButton(props: CardWithActionButtonProps) {
   return (
-    <Card className="max-w-sm my-2">
+    <Card className="max-w my-2">
       <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
         <p>{props.header}</p>
       </h5>

@@ -1,16 +1,19 @@
 "use client";
 import { DarkThemeToggle, Navbar } from "flowbite-react";
-import { FaDog } from "react-icons/fa";
 import { FC } from "react";
+import { FaDog } from "react-icons/fa";
 import { useSidebarContext } from "../context/SidebarContext";
 
-const Header: FC<Record<string, number>> = function ({activeNav}) {
+const Header: FC<Record<string, number>> = function ({ activeNav }) {
   const { isOpenOnSmallScreens, isPageWithSidebar, setOpenOnSmallScreens } =
     useSidebarContext();
 
   return (
     <header className="sticky top-0 z-20">
-      <Navbar fluid className="sticky top-0 z-40 w-full backdrop-blur flex-none lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-slate-50">
+      <Navbar
+        fluid
+        className="sticky top-0 z-40 w-full backdrop-blur flex-none lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-slate-100"
+      >
         {isPageWithSidebar && (
           <button
             aria-controls="sidebar"
@@ -48,24 +51,15 @@ const Header: FC<Record<string, number>> = function ({activeNav}) {
           </button>
         )}
         <Navbar.Brand href="/">
-          <FaDog height="24" width="24" className="dark:text-white"/>
+          <FaDog height="24" width="24" className="dark:text-white" />
           <span className="self-center whitespace-nowrap px-3 text-xl font-semibold dark:text-white">
             RE Scout
           </span>
         </Navbar.Brand>
         <div className="flex md:order-2">
-          <Navbar.Toggle />
+          {/* <Navbar.Toggle /> */}
           <DarkThemeToggle />
         </div>
-        <Navbar.Collapse>
-          <Navbar.Link href="/" active={activeNav === 0}>
-            Home
-          </Navbar.Link>
-          <Navbar.Link href="/feed" active={activeNav === 1}>Feed</Navbar.Link>
-          <Navbar.Link href="/services" active={activeNav === 2}>Services</Navbar.Link>
-          <Navbar.Link href="/pricing" active={activeNav === 3}>Pricing</Navbar.Link>
-          <Navbar.Link href="/contact" active={activeNav === 4}>Contact</Navbar.Link>
-        </Navbar.Collapse>
       </Navbar>
     </header>
   );

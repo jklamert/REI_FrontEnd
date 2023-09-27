@@ -21,3 +21,17 @@ export function isNegative(value: number) {
     return false;
   }
 }
+export function isValidZip(value: string) {
+  let didPass = false;
+  const validChars = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+  if (value && value.length === 5) {
+    for (let index = 0; index < value.length; index++) {
+      const char = value[index] || "";
+      if (validChars.indexOf(char) < 0) {
+        didPass = false;
+      }
+    }
+    didPass = true;
+  }
+  return didPass;
+}
