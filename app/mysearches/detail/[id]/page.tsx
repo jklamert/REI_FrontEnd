@@ -12,7 +12,14 @@ import ActualSidebar from "#components/actualSidebar";
 import Header from "#components/header";
 import { useMutation } from "@apollo/client";
 import { useQuery } from "@apollo/experimental-nextjs-app-support/ssr";
-import { Button, Card, Label, Spinner, TextInput } from "flowbite-react";
+import {
+  Button,
+  Card,
+  Label,
+  RangeSlider,
+  Spinner,
+  TextInput,
+} from "flowbite-react";
 import { FormEvent, useEffect, useState } from "react";
 // import {getClient} from "#app/context/ApolloClient";
 
@@ -218,8 +225,13 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
    * @param value
    */
   const onMaxBathChanged = (value: number) => {
-    if ((isPositive(value) && isWholeNum(value)) || value === 0) {
+    const minBathInt = parseInt(minBath);
+    if (
+      (isPositive(value) && isWholeNum(value) && minBathInt <= value) ||
+      value === 0
+    ) {
       setIsMaxBathValid(true);
+      setIsMinBathValid(true);
     } else {
       setIsMaxBathValid(false);
     }
@@ -227,7 +239,12 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
   };
 
   const onMinBathChanged = (value: number) => {
-    if ((isPositive(value) && isWholeNum(value)) || value === 0) {
+    const maxBathInt = parseInt(maxBath);
+    if (
+      (isPositive(value) && isWholeNum(value) && value <= maxBathInt) ||
+      value === 0
+    ) {
+      setIsMaxBathValid(true);
       setIsMinBathValid(true);
     } else {
       setIsMinBathValid(false);
@@ -363,6 +380,14 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
 
   const onSearchCriteriaSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const invalidFields = getInvalidFields();
+    if (invalidFields && invalidFields.length) {
+      const invalidStr = invalidFields.join(", ");
+      window.alert(`The following fields are invalid: ${invalidStr}`);
+      return;
+    }
+
     console.debug("Submitting search criteria.");
     await updateSearchCriteria({
       variables: {
@@ -403,9 +428,72 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
     setEditModeCriteria(false);
   };
 
+  const getInvalidFields = () => {
+    const invalidFields = [];
+    if (!isBedsValid) {
+      invalidFields.push("Beds");
+    }
+    if (!isMaxBathValid) {
+      invalidFields.push("Max Baths");
+    }
+    if (!isMinBathValid) {
+      invalidFields.push("Minimum Baths");
+    }
+    if (!isTaxValid) {
+      invalidFields.push("Taxes");
+    }
+    if (!isInsuranceValid) {
+      invalidFields.push("Insurance");
+    }
+    if (!isWaterValid) {
+      invalidFields.push("Water");
+    }
+    if (!isSewerValid) {
+      invalidFields.push("Sewer");
+    }
+    if (!isGarbageValid) {
+      invalidFields.push("Garbage");
+    }
+    if (!isElectricValid) {
+      invalidFields.push("Electric");
+    }
+    if (!isGasValid) {
+      invalidFields.push("Gas");
+    }
+    if (!isHoaValid) {
+      invalidFields.push("HOA");
+    }
+    if (!isLotValid) {
+      invalidFields.push("Lot");
+    }
+    if (!isVacancyValid) {
+      invalidFields.push("Vacancy");
+    }
+    if (!isRepairsValid) {
+      invalidFields.push("Repairs");
+    }
+    if (!isCapexValid) {
+      invalidFields.push("Capex");
+    }
+    if (!isManagementValid) {
+      invalidFields.push("Management");
+    }
+    if (!isMortgageValid) {
+      invalidFields.push("Mortgage");
+    }
+    return invalidFields;
+  };
+
   const onExpenseSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     console.debug("Submitting expense data.");
+
+    const invalidFields = getInvalidFields();
+    if (invalidFields && invalidFields.length) {
+      const invalidStr = invalidFields.join(", ");
+      window.alert(`The following fields are invalid: ${invalidStr}`);
+      return;
+    }
 
     const id = data?.search?.expenseFk?.id;
     if (id) {
@@ -534,13 +622,19 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
                   }}
                 />
               </div>
+
               <div>
                 <div className="mb-2 block">
-                  <Label htmlFor="maxBaths" value="Max Baths" />
+                  <Label
+                    className="dark:text-gray-300"
+                    htmlFor="maxBaths"
+                    color={!isMaxBathValid ? "failure" : ""}
+                    value={maxBath ? `Max Baths (${maxBath})` : "Max Baths"}
+                  />
                 </div>
-                <TextInput
+                <RangeSlider
                   id="maxBaths"
-                  color={!isMaxBathValid ? "failure" : ""}
+                  placeholder="Maximum Baths"
                   value={maxBath}
                   required
                   onChange={(e) => {
@@ -550,13 +644,21 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
                   }}
                 />
               </div>
+
               <div>
                 <div className="mb-2 block">
-                  <Label htmlFor="minBaths" value="Minimum Baths" />
+                  <Label
+                    className="dark:text-gray-300"
+                    htmlFor="minBaths"
+                    color={!isMinBathValid ? "failure" : ""}
+                    value={
+                      minBath ? `Minimum Baths (${minBath})` : "Minimum Baths"
+                    }
+                  />
                 </div>
-                <TextInput
+                <RangeSlider
                   id="minBaths"
-                  color={!isMinBathValid ? "failure" : ""}
+                  placeholder="Minimum Baths"
                   value={minBath}
                   required
                   onChange={(e) => {
@@ -566,10 +668,11 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
                   }}
                 />
               </div>
+
               <div className="flex flex-row gap-2">
                 <Button
                   type="button"
-                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800"
+                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800 dark:hover:bg-red-800"
                   disabled={updateCriteriaLoading}
                   onClick={() => {
                     setCriteriaData(data?.search);
@@ -872,7 +975,7 @@ function SearchDetailPage(props: { id: string }): JSX.Element {
               <div className="flex flex-row gap-2">
                 <Button
                   type="button"
-                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800"
+                  className="bg-red-600 dark:bg-red-600 hover:bg-red-800 dark:hover:bg-red-800"
                   disabled={updateExpenseLoading}
                   onClick={() => {
                     setEditModeExpense(false);

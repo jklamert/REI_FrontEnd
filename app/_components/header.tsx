@@ -4,7 +4,7 @@ import { FC } from "react";
 import { FaDog } from "react-icons/fa";
 import { useSidebarContext } from "../context/SidebarContext";
 
-const Header: FC<Record<string, number>> = function ({ activeNav }) {
+const Header: FC<Record<string, number>> = function () {
   const { isOpenOnSmallScreens, isPageWithSidebar, setOpenOnSmallScreens } =
     useSidebarContext();
 
@@ -12,7 +12,7 @@ const Header: FC<Record<string, number>> = function ({ activeNav }) {
     <header className="sticky top-0 z-20">
       <Navbar
         fluid
-        className="sticky top-0 z-40 w-full backdrop-blur flex-none lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06] bg-slate-100"
+        className="bg-slate-100 sticky top-0 z-40 w-full backdrop-blur flex-none lg:border-b lg:border-slate-900/10 dark:border-slate-50/[0.06]"
       >
         {isPageWithSidebar && (
           <button
